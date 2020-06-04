@@ -16,7 +16,9 @@ public class Screen extends JPanel implements Runnable
 
     public static final int WIDTH=800, HEIGHT=800;
     private Thread thread;
+    private Snake snakeThread;
     private boolean running = false;
+    private boolean snakeRunning = false;
 
     private BodyPart b;
     private ArrayList<BodyPart> snake;
@@ -52,12 +54,6 @@ public class Screen extends JPanel implements Runnable
 
     public void tick()
     {
-        if(snake.size()==0)
-        {
-            b= new BodyPart(x,y,10);
-            snake.add(b);
-        }
-
         if(fruits.size()==0)
         {
             int x = r.nextInt(79);
@@ -67,51 +63,15 @@ public class Screen extends JPanel implements Runnable
             fruits.add(fruit);
         }
 
-        for(int i=0; i<fruits.size(); i++)
-        {
-            if(x==fruits.get(i).getX() && y==fruits.get(i).getY())
-            {
+        for(int i=0; i<fruits.size(); i++) {
+            if (x == fruits.get(i).getX() && y == fruits.get(i).getY()) {
                 size++;
                 fruits.remove(i);
                 i--;
             }
         }
 
-        for(int i=0; i<snake.size(); i++)
-        {
-            if(x==snake.get(i).getX() && y==snake.get(i).getY())
-            {
-                if(i != snake.size()-1)
-                {
-                    stop();
-                }
-            }
-        }
 
-        if(x<0 || x>79 || y<0 || y>79)
-        {
-            stop();
-        }
-
-        ticks++;
-
-        if(ticks>500000)
-        {
-            if(right) x++;
-            if(left) x--;
-            if(up) y--;
-            if(down) y++;
-
-            ticks =0;
-
-            b= new BodyPart(x,y,10);
-            snake.add(b);
-
-            if(snake.size()>size)
-            {
-                snake.remove(0);
-            }
-        }
     }
 
     public void paint(Graphics g)
@@ -146,6 +106,9 @@ public class Screen extends JPanel implements Runnable
         running = true;
         thread = new Thread(this,"GameLoop");
         thread.start();
+        snakeRunning = true;
+        snakeThread = new Snake();
+        snakeThread.start();
     }
 
     public void stop()
@@ -216,5 +179,76 @@ public class Screen extends JPanel implements Runnable
         {
 
         }
+    }
+
+    private class Snake extends Thread implements Runnable
+    {
+        public void tick()
+        {
+            if(snake.size()==0)
+            {
+                b= new BodyPart(x,y,10);
+                snake.add(b);
+            }
+
+            for(int i=0; i<snake.size(); i++)
+            {
+                if(x==snake.get(i).getX() && y==snake.get(i).getY())
+                {
+                    if(i != snake.size()-1)
+                    {
+                        stopSnake();
+                    }
+                }
+            }
+
+            if(x<0 || x>79 || y<0 || y>79)
+            {
+                stopSnake();
+            }
+
+            ticks++;
+
+            if(ticks>250000)
+            {
+                if(right) x++;
+                if(left) x--;
+                if(up) y--;
+                if(down) y++;
+
+                ticks =0;
+
+                b= new BodyPart(x,y,10);
+                snake.add(b);
+
+                if(snake.size()>size)
+                {
+                    snake.remove(0);
+                }
+            }
+        }
+
+        public void run()
+        {
+            while (snakeRunning)
+            {
+                tick();
+                repaint();
+            }
+        }
+
+
+        public void stopSnake()
+        {
+            try
+            {
+                snakeThread.join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
     }
 }
