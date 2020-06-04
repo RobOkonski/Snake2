@@ -10,14 +10,14 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Screen extends JPanel implements Runnable
+public class Screen extends JPanel
 {
     private static final long  serialVersionUID = 1L;
 
     public static final int WIDTH=800, HEIGHT=800;
-    private Thread thread;
+    private FruitGenerator fruitGeneratorThread;
     private Snake snakeThread;
-    private boolean running = false;
+    private boolean fruitGeneratorRunning = false;
     private boolean snakeRunning = false;
 
     private BodyPart b;
@@ -52,27 +52,6 @@ public class Screen extends JPanel implements Runnable
         start();
     }
 
-    public void tick()
-    {
-        if(fruits.size()==0)
-        {
-            int x = r.nextInt(79);
-            int y = r.nextInt(79);
-
-            fruit = new Fruit(x,y,10);
-            fruits.add(fruit);
-        }
-
-        for(int i=0; i<fruits.size(); i++) {
-            if (x == fruits.get(i).getX() && y == fruits.get(i).getY()) {
-                size++;
-                fruits.remove(i);
-                i--;
-            }
-        }
-
-
-    }
 
     public void paint(Graphics g)
     {
@@ -103,34 +82,12 @@ public class Screen extends JPanel implements Runnable
 
     public void start()
     {
-        running = true;
-        thread = new Thread(this,"GameLoop");
-        thread.start();
+        fruitGeneratorRunning = true;
+        fruitGeneratorThread = new FruitGenerator();
+        fruitGeneratorThread.start();
         snakeRunning = true;
         snakeThread = new Snake();
         snakeThread.start();
-    }
-
-    public void stop()
-    {
-        running = false;
-        try
-        {
-            thread.join();
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public void run()
-    {
-        while (running)
-        {
-            tick();
-            repaint();
-        }
     }
 
     private class Key implements KeyListener
@@ -249,6 +206,50 @@ public class Screen extends JPanel implements Runnable
                 e.printStackTrace();
             }
         }
+    }
 
+    private class FruitGenerator extends Thread implements Runnable
+    {
+        public void tick()
+        {
+            if(fruits.size()==0)
+            {
+                int x = r.nextInt(79);
+                int y = r.nextInt(79);
+
+                fruit = new Fruit(x,y,10);
+                fruits.add(fruit);
+            }
+
+            for(int i=0; i<fruits.size(); i++) {
+                if (x == fruits.get(i).getX() && y == fruits.get(i).getY()) {
+                    size++;
+                    fruits.remove(i);
+                    i--;
+                }
+            }
+        }
+
+        public void run()
+        {
+            while (fruitGeneratorRunning)
+            {
+                tick();
+                repaint();
+            }
+        }
+
+        public void stopFruit()
+        {
+            fruitGeneratorRunning = false;
+            try
+            {
+                fruitGeneratorThread.join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 }
