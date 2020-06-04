@@ -10,33 +10,67 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class that represents screen actions extends JPanel
+ */
 public class Screen extends JPanel
 {
+
+    /** Serialization variable */
     private static final long  serialVersionUID = 1L;
 
-    public static final int WIDTH=800, HEIGHT=800;
+    /** Store width of the grid */
+    public static final int WIDTH=800;
+    /** Store height of the grid */
+    public static final int HEIGHT=800;
+    /** Fruit generator thread */
     private FruitGenerator fruitGeneratorThread;
+    /** Snake thread */
     private Snake snakeThread;
+    /** Store if fruit generator thread is running */
     private boolean fruitGeneratorRunning = false;
+    /** Store if snake thread is running */
     private boolean snakeRunning = false;
 
+    /** Store body part before list addition */
     private BodyPart b;
+    /** Store snake body parts */
     private ArrayList<BodyPart> snake;
 
+    /** Store fruit before list addition */
     private Fruit fruit;
+    /** Store fruits */
     private ArrayList<Fruit> fruits;
 
+    /** Random class object (used to generate fruits)*/
     private Random r;
 
-    private int x=10, y=10;
+    /** Start x coordinate of snake */
+    private int x=10;
+    /** Start y coordinate of snake */
+    private int y=10;
+    /** Start size of snake */
     private int size =5;
 
-    private boolean right=true, left=false, up=false,down=false;
+    /** Store if right key was pressed (true on start) */
+    private boolean right=true;
+    /** Store if left key was pressed (false on start) */
+    private boolean left=false;
+    /** Store if up key was pressed (false on start) */
+    private boolean up=false;
+    /** Store if down key was pressed (false on start) */
+    private boolean down=false;
 
+    /** Clock ticks counter */
     private int ticks =0;
 
+    /** Key object (used to define keyboard keys) */
     private Key key;
 
+    /**
+     * Screen class constructor
+     * Initialise screen view
+     */
     public Screen()
     {
         setFocusable(true);
@@ -53,6 +87,10 @@ public class Screen extends JPanel
     }
 
 
+    /**
+     * Paint grid, snakes body parts and fruits
+     * @param g graphics object
+     */
     public void paint(Graphics g)
     {
         g.clearRect(0,0,WIDTH,HEIGHT);
@@ -80,6 +118,9 @@ public class Screen extends JPanel
         }
     }
 
+    /**
+     * Start threads in single play
+     */
     public void start()
     {
         fruitGeneratorRunning = true;
@@ -90,8 +131,15 @@ public class Screen extends JPanel
         snakeThread.start();
     }
 
+    /**
+     * Private class that implements key listener to take info from keyboard
+     */
     private class Key implements KeyListener
     {
+        /**
+         * Check if key was pressed and define action in game
+         * @param e key event
+         */
         public void keyPressed(KeyEvent e)
         {
             int key = e.getKeyCode();
@@ -125,12 +173,20 @@ public class Screen extends JPanel
             }
         }
 
+        /**
+         * Overide interface keyTyped method
+         * @param e key event
+         */
         @Override
         public void keyTyped(KeyEvent e)
         {
 
         }
 
+        /**
+         * Overide interface keyReleased method
+         * @param e key event
+         */
         @Override
         public void keyReleased(KeyEvent e)
         {
@@ -138,8 +194,17 @@ public class Screen extends JPanel
         }
     }
 
+    /**
+     * Private class that create Snake thread
+     * Extends thread class
+     * Implements Runnable interface
+     */
     private class Snake extends Thread implements Runnable
     {
+        /**
+         * Represents snake action and logic
+         * Check collisions and set moves
+         */
         public void tick()
         {
             if(snake.size()==0)
@@ -185,6 +250,9 @@ public class Screen extends JPanel
             }
         }
 
+        /**
+         * Start thread run
+         */
         public void run()
         {
             while (snakeRunning)
@@ -194,7 +262,9 @@ public class Screen extends JPanel
             }
         }
 
-
+        /**
+         * End thread after collision
+         */
         public void stopSnake()
         {
             try
@@ -208,8 +278,17 @@ public class Screen extends JPanel
         }
     }
 
+    /**
+     * Private class that create Fruit generator
+     * Extends thread class
+     * Implements runnable interface
+     */
     private class FruitGenerator extends Thread implements Runnable
     {
+        /**
+         * Represents fruit generator actions and logic
+         * Set and remove fruits after snakes consumption
+         */
         public void tick()
         {
             if(fruits.size()==0)
@@ -230,6 +309,9 @@ public class Screen extends JPanel
             }
         }
 
+        /**
+         * Start fruit generator thread run
+         */
         public void run()
         {
             while (fruitGeneratorRunning)
@@ -239,6 +321,9 @@ public class Screen extends JPanel
             }
         }
 
+        /**
+         * End fruit generator thread after collision
+         */
         public void stopFruit()
         {
             fruitGeneratorRunning = false;
