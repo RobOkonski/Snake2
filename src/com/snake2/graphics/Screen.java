@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,6 +16,11 @@ import java.util.Random;
  * Class that represents screen actions extends JPanel
  */
 public class Screen extends JPanel {
+
+    /**
+     * Store players nick
+     */
+    private String nick;
 
     /**
      * Serialization variable
@@ -178,8 +185,10 @@ public class Screen extends JPanel {
     /**
      * Screen class constructor
      * Initialise screen view
+     * @param nick_p players nick
      */
-    public Screen() {
+    public Screen(String nick_p) {
+        nick = nick_p;
         setFocusable(true);
         key = new Key();
         addKeyListener(key);
@@ -194,6 +203,20 @@ public class Screen extends JPanel {
         start();
     }
 
+    /**
+     * Add new score to file
+     */
+    public void WriteScore()
+    {
+        File file = new File("./Scores.txt");
+        try {
+            FileWriter fr = new FileWriter(file,true);
+            fr.write("\n" + nick + " " + size);
+            fr.close();
+        }
+        catch(Exception e){}
+
+    }
 
     /**
      * Paint grid, snakes body parts and fruits
@@ -368,6 +391,7 @@ public class Screen extends JPanel {
          * End thread after collision
          */
         public void stopSnake() {
+            WriteScore();
             try {
                 snakeThread.join();
             } catch (InterruptedException e) {
@@ -496,7 +520,7 @@ public class Screen extends JPanel {
          * Set and remove fruits after snakes consumption
          */
         public void tick() {
-            if (fruits.size() == 0) {
+            if (fruits.size() < 10) {
                 int x = r.nextInt(79);
                 int y = r.nextInt(79);
 
