@@ -3,3 +3,5 @@ karol 5
 robert 7
 grzesiek 9
 robert 23
+kazik 14
+nick 3
