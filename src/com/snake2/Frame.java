@@ -10,7 +10,6 @@ import java.awt.*;
  */
 public class Frame extends JFrame
 {
-
     /**
      * Constructor of frame
      * Initialise window options, exit case and window title
@@ -20,24 +19,40 @@ public class Frame extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //turn off a program when you shout down the window
         setTitle("Snake");
         setResizable(false);
-
         init();
     }
 
     /**
-     * Initialize window frame
+     * Initialize window frame with menu screen
      */
     public void init()
     {
         setLayout(new GridLayout(1,1,0,0));
-
-        Screen s = new Screen();
-        add(s);
+        Menu m = new Menu(this);
+        setContentPane(m.panel1);
 
         pack();
 
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    /**
+     * Starts game after pressing start in menu
+     */
+    public void start()
+    {
+        getContentPane().removeAll();
+        setLayout(new GridLayout(1,1,0,0));
+        Screen s = new Screen();
+        add(s);
+        s.requestFocus(true);
+
+        pack();
+
+        setLocationRelativeTo(null);
+        setVisible(true);
+
     }
 
     /**
